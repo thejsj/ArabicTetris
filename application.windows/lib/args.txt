@@ -1,0 +1,3 @@
+-Xms128m -Xmx256m
+arabictetris.ArabicTetris
+ArabicTetris.jar

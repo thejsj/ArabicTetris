@@ -36,7 +36,7 @@ public class ArabicTetris extends PApplet {
 
 	String[][] alphabetArray;
 	
-	String[][] dictionaryArray; 
+	String[][] dictionaryArray;
 
 	PImage[][] imageArray;
 	
@@ -510,8 +510,6 @@ public class ArabicTetris extends PApplet {
 	
 
 	public void submitHighScore(){
-		
-		//println(getClass().getResourceAsStream("/data/tsv/highscores.tsv"));
 		
 		output = createWriter("src/data/tsv/highscores.tsv"); 
 		output2 = createWriter("bin/data/tsv/highscores.tsv"); 

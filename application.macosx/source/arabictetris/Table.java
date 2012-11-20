@@ -1,6 +1,5 @@
 package arabictetris;
 import processing.core.PApplet;
-import processing.core.PConstants;
 public class Table {
 	  int rowCount;
 	  String[][] data;
@@ -14,7 +13,7 @@ public class Table {
 	    data = new String[rows.length][];
 	    
 	    for (int i = 0; i < rows.length; i++) {
-	      if (PApplet.trim(rows[i]).length() == 0) {
+	      if (parent.trim(rows[i]).length() == 0) {
 	        continue; // skip empty rows
 	      }
 	      if (rows[i].startsWith("#")) {
@@ -22,7 +21,7 @@ public class Table {
 	      }
 	      
 	      // split the row on the tabs
-	      String[] pieces = PApplet.split(rows[i], PConstants.TAB);
+	      String[] pieces = parent.split(rows[i], parent.TAB);
 	      // copy to the table array
 	      data[rowCount] = pieces;
 	      rowCount++;
@@ -31,7 +30,7 @@ public class Table {
 	      //data[rowCount++] = split(rows[i], TAB);
 	    }
 	    // resize the 'data' array as necessary
-	    data = (String[][]) PApplet.subset(data, 0, rowCount);
+	    data = (String[][]) parent.subset(data, 0, rowCount);
 	  }
 	  
 	  
@@ -47,7 +46,7 @@ public class Table {
 	        return i;
 	      }
 	    }
-	    PApplet.println("No row named '" + name + "' was found");
+	    parent.println("No row named '" + name + "' was found");
 	    return -1;
 	  }
 	  
@@ -68,22 +67,22 @@ public class Table {
 
 	  
 	  int getInt(String rowName, int column) {
-	    return PApplet.parseInt(getString(rowName, column));
+	    return parent.parseInt(getString(rowName, column));
 	  }
 
 	  
 	  int getInt(int rowIndex, int column) {
-	    return PApplet.parseInt(getString(rowIndex, column));
+	    return parent.parseInt(getString(rowIndex, column));
 	  }
 
 	  
 	  float getFloat(String rowName, int column) {
-	    return PApplet.parseFloat(getString(rowName, column));
+	    return parent.parseFloat(getString(rowName, column));
 	  }
 
 	  
 	  float getFloat(int rowIndex, int column) {
-	    return PApplet.parseFloat(getString(rowIndex, column));
+	    return parent.parseFloat(getString(rowIndex, column));
 	  }
 	  
 	  
@@ -104,23 +103,23 @@ public class Table {
 
 	  
 	  void setInt(int rowIndex, int column, int what) {
-	    data[rowIndex][column] = PApplet.str(what);
+	    data[rowIndex][column] = parent.str(what);
 	  }
 
 	  
 	  void setInt(String rowName, int column, int what) {
 	    int rowIndex = getRowIndex(rowName);
-	    data[rowIndex][column] = PApplet.str(what);
+	    data[rowIndex][column] = parent.str(what);
 	  }
 
 	  
 	  void setFloat(int rowIndex, int column, float what) {
-	    data[rowIndex][column] = PApplet.str(what);
+	    data[rowIndex][column] = parent.str(what);
 	  }
 
 
 	  void setFloat(String rowName, int column, float what) {
 	    int rowIndex = getRowIndex(rowName);
-	    data[rowIndex][column] = PApplet.str(what);
+	    data[rowIndex][column] = parent.str(what);
 	  }  
 	}

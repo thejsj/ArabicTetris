@@ -1,4 +1,0 @@
-#!/bin/sh
-
-APPDIR=$(dirname "$0")
-java -Xms128m -Xmx256m -Djava.library.path="$APPDIR" -cp "lib/ArabicTetris.jar"arabictetris.ArabicTetris

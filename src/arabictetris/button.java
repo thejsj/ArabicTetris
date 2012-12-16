@@ -22,6 +22,8 @@ public class button{
 	
 	float widthOfText; 
 	
+	int otherState;
+	
 	/* 
 	 * 
 	 * 0 - StartScreen
@@ -43,7 +45,7 @@ public class button{
 	 * 
 	 */
 	
-	button(float tx, float ty, String ttext, int tDestinationState, int tlanguage, PApplet p){
+	button(float tx, float ty, String ttext, int tDestinationState, int tlanguage, int totherState, PApplet p){
 		
 		parent = p; 
 		
@@ -68,6 +70,8 @@ public class button{
 		text = ttext;
 		
 		language = tlanguage;
+		
+		otherState = totherState;
 			
 	}
 
@@ -76,19 +80,32 @@ public class button{
 	
 		if(current && !((ArabicTetris) parent).writingMode){
 			
-			((ArabicTetris) parent).fill(0,0,255);
+			((ArabicTetris) parent).fill(((ArabicTetris) parent).hightlightColor);
 			
 		}
 		
 		else {
 			
-			((ArabicTetris) parent).fill(255);
+			
+			((ArabicTetris) parent).fill(((ArabicTetris) parent).whiteColor);
 			
 		}
 		
-		((ArabicTetris) parent).textSize(14);
+		if(language == 0){
+			
+			((ArabicTetris) parent).textFont(((ArabicTetris) parent).univers, 32);
+			
+		}
 		
-		((ArabicTetris) parent).text(text,x,y,widthOfText,25);
+		else {
+			
+			//((ArabicTetris) parent).textFont(((ArabicTetris) parent).helvetica,32);
+			
+		}
+		
+		((ArabicTetris) parent).textSize(24);
+		
+		((ArabicTetris) parent).text(text,x,y,widthOfText, 40);
 		
 	}
 	

@@ -106,7 +106,7 @@ public class letter {
 	    
 	    parent.translate( letterPosition, (float) (((ArabicTetris) parent).baseline - ( hgt * 0.15 )));
 	    
-		    parent.fill(255);
+		    parent.fill(((ArabicTetris) parent).letterColor);
 		    
 		    parent.textSize(12);
 		    

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.prefs.*;
 
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -33,7 +34,12 @@ public class ArabicTetris extends PApplet {
 	   
 
 	private static final long serialVersionUID = 1L;
+	
+	// declare my variable at the top of my Java class
+	private Preferences prefs;
 
+	/* = Preferences == */
+	
 	String[][] alphabetArray;
 	
 	String[][] dictionaryArray; 
@@ -76,6 +82,18 @@ public class ArabicTetris extends PApplet {
 	
 	PFont helvetica;
 	
+	PFont univers;
+	
+	public int letterColor = color(46,54,52);
+	
+	public int backgroundColor = color(63,71,69);
+	
+	public int hightlightColor = color(255,130,116);
+	
+	public int whiteColor = color(255,255,255);
+	
+	public int mutedHighlightColor = color(125,89,83);
+	
 	/* ================ */
 
 	/* = Game Stuff == */
@@ -87,6 +105,8 @@ public class ArabicTetris extends PApplet {
 	int currentButton = 0; 
 
 	int gameState = 0;
+	
+	int gameState2Mode = 0;
 
 	int chosenLanguage = 0; //English as Default
 	
@@ -99,6 +119,7 @@ public class ArabicTetris extends PApplet {
 	String highScoreName;
 	
 	boolean writingMode;
+
 
 	/* ================ */
 
@@ -116,12 +137,18 @@ public class ArabicTetris extends PApplet {
 	  
 	  textAlign(CENTER);
 	  
-	  widthOfTextBox = width/5;
+	  widthOfTextBox = width/4;
 	  
-	  helvetica = loadFont("HelveticaNeueLTArabic-Roman-48.vlw");
+	  helvetica = loadFont("Helvetica.vlw");
 	  
-	  //textFont(helvetica, 32);
-
+	  univers = loadFont("Univers.vlw");
+	  
+	  //textFont(univers, 32);
+	  
+	  /* ================ */
+	  
+	  // create a Preferences instance (somewhere later in the code)
+      
 	  /* ================ */
 	  
 	  //Load Images (Single Images)
@@ -260,8 +287,23 @@ public class ArabicTetris extends PApplet {
 		   
 		//Language
 		buttonArray[row2][5] = buttonList.getString(row2, 5);
-		   
-		//Function
+		
+		println(buttonList.getString(row2, 5));
+		try{
+			
+			if(buttonList.getString(row2, 6) != null){
+				
+				buttonArray[row2][6] = buttonList.getString(row2, 6);
+				
+			}
+		
+	  	}
+		
+		catch(Exception e){
+			
+			println(buttonArray[row2][0] +" / "+buttonArray[row2][5]+" / "+ e);
+			
+		}
 		//buttonArray[row2][6] = buttonList.getString(row2, 6);
 			  
 	  }
@@ -271,7 +313,7 @@ public class ArabicTetris extends PApplet {
 	  
 	  populateButtonsForState(0);
 	  
-	  readHighScores();	  
+	  readHighScores();	 
 	  
 	  	
 	} //End Setup
@@ -282,7 +324,7 @@ public class ArabicTetris extends PApplet {
 
 		  if(gamePaused != true){
 		  
-			  background(0); 
+			  background(backgroundColor); 
 			  
 			  setEnviorment(); 
 		 
@@ -440,9 +482,17 @@ public class ArabicTetris extends PApplet {
 					  
 					  int tLanguage = parseInt(buttonArray[row3][5]);
 					  
+					  int otherState = 0; 
+					  
+					  if(buttonArray[row3][6] != null){
+						  
+							otherState = parseInt(buttonArray[row3][6]);
+						  
+					  }
+					  
 					  if(destinationState == 0 || chosenLanguage == tLanguage){
 						  
-						  buttons.add(new button(tx,ty,ttext,tDestinationState,tLanguage, this));
+						  buttons.add(new button(tx,ty,ttext,tDestinationState,tLanguage, otherState, this));
 						  
 					  }
 		
@@ -482,7 +532,7 @@ public class ArabicTetris extends PApplet {
 		
 		if(score > parseInt(highScores[9][0])){
 			
-			// It is, so know we have ask for the name and generate a date
+			// It is, so know we have ask for tphe name and generate a date
 			
 			highScoreName = "Your Name";
 			
@@ -507,14 +557,12 @@ public class ArabicTetris extends PApplet {
 		}
 		
 	}
-	
 
 	public void submitHighScore(){
 		
-		//println(getClass().getResourceAsStream("/data/tsv/highscores.tsv"));
+		readHighScores();
 		
-		output = createWriter("src/data/tsv/highscores.tsv"); 
-		output2 = createWriter("bin/data/tsv/highscores.tsv"); 
+		Preferences prefs = Preferences.userNodeForPackage(ArabicTetris.class);
 		
 		//to rank the scores, look up a date, ask for a name and then re-write highscores.tsv
 		
@@ -552,29 +600,48 @@ public class ArabicTetris extends PApplet {
 			      }
 			    });
 		
-		output.println("score\tname\tdate");
-		output2.println("score\tname\tdate");
+		//Make 1 string for each of the following: Score, Name, and Date
 		
-		for(int i6 = 0; i6 < newHighScores.length; i6++){
+		//Score
+		
+			String highScoreValues = "";
 			
-			String thisLine = "";
-			
-			for(int i5 = 0; i5 < (newHighScores[i6].length - 1); i5++){
+			for(int i6 = 0; i6 < newHighScores.length; i6++){
 				
-				thisLine += newHighScores[i6][i5] + "\t";
+				highScoreValues += newHighScores[i6][0] + ",";
 				
 			}
 			
-			output.println(thisLine);
-			output2.println(thisLine);
+			println("highScoreValues: " + highScoreValues);
 			
-		}
-		
-		output.flush();
-		output2.flush();
-		
-		output.close();
-		output2.close();
+			prefs.put("values",highScoreValues);
+			
+		// Names
+			
+			String highScoreNames = "";
+			
+			for(int i6 = 0; i6 < newHighScores.length; i6++){
+				
+				highScoreNames += newHighScores[i6][1] + ",";
+				
+			}
+			
+			println("highScoreNames: " + highScoreNames);
+			
+			prefs.put("names",highScoreNames);
+			
+		// Date
+			
+			String highScoreDates = "";
+			
+			for(int i6 = 0; i6 < newHighScores.length; i6++){
+				
+				highScoreDates += newHighScores[i6][2] + ",";
+			}
+			
+			println("highScoreDates: " + highScoreDates);
+			
+			prefs.put("dates",highScoreDates);
 		
 		readHighScores();
 		
@@ -587,28 +654,44 @@ public class ArabicTetris extends PApplet {
 	
 	public void readHighScores(){
 		
-		//High Scores
-		  Table highScoresTable;
+		//High Score
 		  
-		  highScoresTable = new Table("tsv/highscores.tsv",this);
+	//Preferences Code
+		
+		Preferences prefs = Preferences.userNodeForPackage(ArabicTetris.class);
 		  
-		  highScoresCount = highScoresTable.getRowCount();
+		  String highScoreValues = prefs.get("values", "0,0,0,0,0,0,0,0,0,0,0");
 		  
-		  highScores = new String[highScoresCount - 1][3];
+		  String highScoreNames =  prefs.get("names","Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,Jorge Silva-Jetter,");
 		  
-		//Load All words into an Array
-		  for (int row3 = 0; row3 < (highScoresCount - 1); row3++) { //We leave out the title
+		  String highScoreDates= prefs.get("dates", "12/14/2012,12/14/2012,12/14/2012,12/14/2012,12/14/2012,12/14/2012,12/14/2012,12/14/2012,12/14/2012,12/14/2012,");
+		  
+		  String[] tempValues = highScoreValues.split(",");
+		  
+		  String[] tempNames = highScoreNames.split(",");
+		  
+		  String[] tempDates = highScoreDates.split(",");
+		  
+		  highScoresCount = tempValues.length;
+		  
+		  highScores = new String[highScoresCount][3];
+		  
+		  println("HIGH SCORES:");
+		  
+		  for (int row3 = 0; row3 < (highScoresCount - 1); row3++){
 			  
-			// Score  
-			highScores[row3][0] = highScoresTable.getString(row3 + 1, 0);
+			  	// Score  
+				highScores[row3][0] = tempValues[row3];
+					  
+				// Person
+				highScores[row3][1] = tempNames[row3];
 				  
-			// Person
-			highScores[row3][1] = highScoresTable.getString(row3 + 1, 1);
-			  
-			// Date
-			highScores[row3][2] = highScoresTable.getString(row3 + 1, 2);
-			
-		  }
+				// Date
+				highScores[row3][2] = tempDates[row3];
+				
+				println(row3 +": "+highScores[row3][0] + " / " + highScores[row3][1] + " / " + highScores[row3][2]);
+					  
+		  }	  
 		
 	}
 	
@@ -634,11 +717,11 @@ public class ArabicTetris extends PApplet {
 		
 		if(what == 3){
 			
-			fill(0);
+			fill(mutedHighlightColor);
 			
-			stroke(255);
+			//stroke(255);
 			
-			rect(width/2 - widthOfTextBox/2 - 50,(float)(height * 0.37), widthOfTextBox + 100,(float)(height * 0.37) );
+			rect(width/2 - widthOfTextBox/2,(float)(height * 0.37), widthOfTextBox,(float)(height * 0.47) );
 		
 			txt = "YOU WIN";
 			
@@ -646,25 +729,27 @@ public class ArabicTetris extends PApplet {
 			
 			textSize(20);
 			
-			fill(255);
+			fill(backgroundColor);
+			
+			textSize(14);
 			
 			String finalText = "The word you solved is "+ dictionaryArray[randomDictionaryEntry][3] +" and it means "+dictionaryArray[randomDictionaryEntry][0]+".";
 			
-			text(finalText, 300,500,360,200);
+			text(finalText, width/2 - 100,300,200,300);
 			
-			text(dictionaryArray[randomDictionaryEntry][1], 300,400,360,200);
+			//text(dictionaryArray[randomDictionaryEntry][1], 300,400,360,200);
 	
 		}
 	
 		else if(what == 4){
 		 
-			fill(0);
+			fill(backgroundColor);
 			
-			stroke(255);
+		//	stroke(255);
 			
-			rect(width/2 - widthOfTextBox/2 - 50,(float)(height * 0.37), widthOfTextBox + 100,(float)(height * 0.37) );
+			rect(width/2 - widthOfTextBox/2,(float)(height * 0.37), widthOfTextBox,(float)(height * 0.47) );
 		
-			txt = "GAME OVER";
+			txt = "That's not quite right.\n Try Again?";
 			
 			//The letter you got wrong...
 			
@@ -676,11 +761,11 @@ public class ArabicTetris extends PApplet {
 		
 		else if(what == 7){
 			 
-			fill(0);
+			fill(backgroundColor);
 			
-			stroke(255);
+			//stroke(255);
 			
-			rect(width/2 - widthOfTextBox/2 - 50,(float)(height * 0.37), widthOfTextBox + 100,(float)(height * 0.37) );
+			rect(width/2 - widthOfTextBox/2 - 10,(float)(height * 0.37), widthOfTextBox + 20,(float)(height * 0.47) );
 		
 			txt = "NEW HIGH SCORE";
 			
@@ -692,7 +777,7 @@ public class ArabicTetris extends PApplet {
 			
 			//Space to Write your name
 			
-			fill(255);
+			fill(letterColor);
 			
 			if(writingMode){
 			
@@ -710,13 +795,13 @@ public class ArabicTetris extends PApplet {
 			
 			}
 			
-			stroke(255);
+			stroke(letterColor);
 			
 			line((float)(width/2 - widthOfTextBox/2),(float)(height * 0.52),(float)(width/2 + widthOfTextBox/2),(float)(height * 0.52));	
 			
 		}
 		 
-		fill(255);
+		fill(letterColor);
 	
 		textAlign(CENTER); 
 	
@@ -730,7 +815,7 @@ public class ArabicTetris extends PApplet {
 		
 		//Set Enviorment
 		  
-		  stroke(0,38,178); //Color of the Baseline
+		  stroke(letterColor); //Color of the Baseline
 		  
 		  line(width - margin, baseline, width - margin, baseline+9); 
 		  
@@ -740,67 +825,83 @@ public class ArabicTetris extends PApplet {
 		  
 		  //Draw Grey box
 		  
-		  noStroke(); 
+		  stroke(letterColor);
 		  
-		  fill(51);
-		  
-		  rect(0,0,width,150);
+		  line(0,150,width,150);
 		
 		  //Draw Black box for letter
 		  
-		  fill(0);
+		  fill(letterColor);
 		  
 		  rect(25,25,100,100);
 		  
+		  rect(150,25,100,100);
+		  
 		  //Draw Score
-		  
-		  
 		  
 		  textSize(14);
 		  
+		  println(highScores[9][0]);
+		  
 		  if( score > Float.parseFloat(highScores[9][0]) ){
 			  
-			  fill(255,0,0);
+			  fill(hightlightColor);
 			  
 		  }
 		  
 		  else {
 			  
-			  fill(255);
+			  fill(letterColor);
 			  
 		  }
 		  
-		  text("SCORE: " + parseInt(score), 640,75);
+		  fill(whiteColor);
 		  
-		  fill(255);
+		  textAlign(RIGHT);
 		  
-		  text("SPEED: " + ((parseInt(frameRate) - 10) * 2), 640,45);
+		  text("Score:", 210,65);
+		  
+		  text("Speed:", 210,85);
+		  
+		  fill(hightlightColor);
+		  
+		  textAlign(LEFT);
+		  
+		  text(parseInt(score), 220,65);
+		  
+		  text(((parseInt(frameRate) - 10) * 2), 220,85);
+		  
+		  textAlign(CENTER);
 	}
 	
 	public void startScreen(){	
 		
-		background(0); 
+		background(backgroundColor); 
 		
 		//Show the Title Image
 		
 		image(titleImage,width/2 - titleImage.width/8,150,titleImage.width/4, titleImage.height/4);		
-		
+		/*
 		float titleBackgroundImageWidth = (float) (titleImage.width/(1.6));
 		
 		float titleBackgroundImageHeight = (float) (titleImage.height/(1.6));
 		
-		image(titleBackgroundImage, (width - titleBackgroundImageWidth)/2 + 5, height - 20 - titleBackgroundImageHeight,titleBackgroundImageWidth,titleBackgroundImageHeight);
+		image(titleBackgroundIm
+		age, (width - titleBackgroundImageWidth)/2 + 5, height - 20 - titleBackgroundImageHeight,titleBackgroundImageWidth,titleBackgroundImageHeight);
+	
+		*/
+	
 	}
 	
 	public void homeScreen(){
 		
-		background(0); 
+		background(backgroundColor); 
 		
 		float instructionImageWidth = width - 40;
 		
 		float InstructionImageHeight = (instructionImageWidth)/instructionImages[chosenLanguage].width * instructionImages[chosenLanguage].height; 
 		
-		fill(255);
+		fill(letterColor);
 		
 		image(instructionImages[chosenLanguage], 20,20, instructionImageWidth, InstructionImageHeight);
 		
@@ -808,37 +909,49 @@ public class ArabicTetris extends PApplet {
 	
 	public void showGamePausedScreen(){
 		
-		fill(0);
+		fill(letterColor);
 		
-		stroke(255);
+	//	stroke(255);
 		
-		strokeWeight(1);
+	//	strokeWeight(1);
 		
-		rect(width/2 - widthOfTextBox/2 - 50,(float)(height * 0.37), widthOfTextBox + 100,(float)(height * 0.37) );
+		rect(width/2 - widthOfTextBox/2 - 10,(float)(height * 0.37), widthOfTextBox + 20,(float)(height * 0.42) );
 		
-		fill(0,0,255);
+		fill(mutedHighlightColor);
 		
 		noStroke();
 		
-		text("GAME PAUSED", width/2, (float)(height * 0.45));
+		text("PAUSED", width/2, (float)(height * 0.45));
 		
 	}
 	
 	public void showHighScores(){
 		
-		background(0);
+		background(backgroundColor);
 		
-		fill(255);
+		fill(letterColor);
 		
-		float[] xPosistion = {150,200,300};
+		float[] xPosistion = {150,200,350};
 		
 		text("Score",xPosistion[0], 100);
 
 		text("Name",xPosistion[1], 100);
 
 		text("Date",xPosistion[2], 100);
+		
+		println("HS LEngth:" + highScores.length);
 				
-		for(int iii = 0; iii < highScores.length; iii++){
+		for(int iii = 0; iii < (highScores.length - 1); iii++){
+
+			println("Length of " + iii + ":" + highScores[iii].length);
+			
+			println("hs: " + highScores[iii][0]);
+			
+			println("xpos: " + xPosistion[0]);
+			
+			fill(whiteColor);
+			
+			textSize(18);
 			
 			textAlign(RIGHT);
 			
@@ -857,6 +970,8 @@ public class ArabicTetris extends PApplet {
 	}
 	
 	public void exitGame(){
+		
+		println("Exiting Game");
 		
 		exit();
 		
@@ -977,7 +1092,7 @@ public class ArabicTetris extends PApplet {
 			  
 			else {
 			    
-				println("KeyCode: " + keyCode);
+			//	println("KeyCode: " + keyCode);
 			    
 			}
 		
@@ -1068,10 +1183,32 @@ public class ArabicTetris extends PApplet {
 			
 			StartNewGame();
 			
+			if(currentB.otherState == 1){
+				
+				gameState2Mode = 1; 
+				
+				println("GAME STATE: " + gameState2Mode);
+				
+			}
+			
+			else if(currentB.otherState == 2){
+				
+				gameState2Mode = 2; 
+				
+				println("GAME STATE: " + gameState2Mode);
+				
+			}
+			
+			else {
+				
+				println("GAME STATE NON!!!!");
+				
+			}
+			
+			
 		}
 		
-	}
-	
+	}	
 	
 	public static void main(String _args[]) {
 		PApplet.main(new String[] { arabictetris.ArabicTetris.class.getName() });
